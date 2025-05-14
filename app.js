@@ -1,12 +1,13 @@
 import express from "express";
-import peliculasRoutes from "./routes/peliculasRoutes.js";
+import clientesRoutes from "./src/routes/clientesRoutes.js";
+import peliculasRoutes from "./src/routes/peliculasRoutes.js";
+import empleadosRoutes from "./src/routes/empleadosRoutes.js"; 
 
 const app = express();
 app.use(express.json());
 
+app.use("/api/clientes", clientesRoutes);
 app.use("/api/peliculas", peliculasRoutes);
+app.use("/api/empleados", empleadosRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+export default app;

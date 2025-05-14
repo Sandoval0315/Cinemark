@@ -1,91 +1,63 @@
-import { Schema, models, startSession } from "mongoose";
-const Pelicula = models.Peliculas || model("Peliculas", PeliculasSchema); // Asegúrate de que el modelo esté registrado
+const peliculasController = {};
+import Pelicula from "../models/Peliculas.js";
 
-const handleError = (res, error, statusCode = 500) => {
-  console.error(error);
-  res.status(statusCode).json({ error: error.message });
+// OBTENER TODAS LAS PELÍCULAS
+peliculasController.getPeliculas = async (req, res) => {
+  const peliculas = await Pelicula.find();
+  res.json(peliculas);
 };
 
-export const createPelicula = async (req, res) => {
-  const session = await startSession();
-  session.startTransaction();
-
-  try {
-    const { titulo, description, director, genero, año, duracion, imagen } = req.body;
-    const pelicula = new Pelicula({titulo,description,director,genero,año,duracion,imagen,});
-    await pelicula.save({ session });
-    await session.commitTransaction();
-    res.status(201).json(pelicula);
-  } catch (error) {
-    await session.abortTransaction();
-    handleError(res, error, 400); 
-  } finally {
-    session.endSession();
+// OBTENER UNA PELÍCULA POR ID
+peliculasController.getPelicula = async (req, res) => {
+  const pelicula = await Pelicula.findById(req.params.id);
+  if (!pelicula) {
+    return res.status(404).json({ message: "Película no encontrada" });
   }
+  res.json(pelicula);
 };
 
-export const getPeliculas = async (req, res) => {
-  try {
-    const peliculas = await Pelicula.find();
-    res.status(200).json(peliculas);
-  } catch (error) {
-    handleError(res, error);
+// CREAR NUEVA PELÍCULA
+peliculasController.createPelicula = async (req, res) => {
+  const { titulo, description, director, genero, año, duracion, imagen } = req.body;
+  const nuevaPelicula = new Pelicula({
+    titulo,
+    description,
+    director,
+    genero,
+    año,
+    duracion,
+    imagen
+  });
+  await nuevaPelicula.save();
+  res.json({ message: "Película guardada" });
+};
+
+// ELIMINAR PELÍCULA
+peliculasController.deletePelicula = async (req, res) => {
+  const peliculaEliminada = await Pelicula.findByIdAndDelete(req.params.id);
+  if (!peliculaEliminada) {
+    return res.status(404).json({ message: "Película no encontrada" });
   }
+  res.json({ message: "Película eliminada" });
 };
 
-export const getPeliculaById = async (req, res) => {
-  try {
-    const pelicula = await Pelicula.findById(req.params.id);
-    if (!pelicula) {
-      return res.status(404).json({ error: "Película no encontrada" });
-    }
-    res.status(200).json(pelicula);
-  } catch (error) {
-    handleError(res, error);
-  }
+// ACTUALIZAR PELÍCULA
+peliculasController.updatePelicula = async (req, res) => {
+  const { titulo, description, director, genero, año, duracion, imagen } = req.body;
+  await Pelicula.findByIdAndUpdate(
+    req.params.id,
+    {
+      titulo,
+      description,
+      director,
+      genero,
+      año,
+      duracion,
+      imagen
+    },
+    { new: true }
+  );
+  res.json({ message: "Película actualizada" });
 };
 
-export const updatePelicula = async (req, res) => {
-  const session = await startSession();
-  session.startTransaction();
-  try {
-    const updatedPelicula = await Pelicula.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, session } 
-    );
-    if (!updatedPelicula) {
-      await session.abortTransaction();
-      return res.status(404).json({ error: "Película no encontrada" });
-    }
-    await session.commitTransaction();
-    res.status(200).json(updatedPelicula);
-  } catch (error) {
-    await session.abortTransaction();
-    handleError(res, error, 400);
-  } finally {
-    session.endSession();
-  }
-};
-
-export const deletePelicula = async (req, res) => {
-  const session = await startSession();
-  session.startTransaction();
-
-  try {
-    const deletedPelicula = await Pelicula.findByIdAndDelete(req.params.id, { session });
-
-    if (!deletedPelicula) {
-      await session.abortTransaction();
-      return res.status(404).json({ error: "Película no encontrada" });
-    }
-
-    await session.commitTransaction();
-    res.status(200).json({ message: "Película eliminada correctamente" });
-  } catch (error) {
-    await session.abortTransaction();
-    handleError(res, error);
-  } finally {
-    session.endSession();
-  }
-};
+export default peliculasController;

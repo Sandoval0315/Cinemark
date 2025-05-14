@@ -1,4 +1,4 @@
-import { Schema, models, startSession } from "mongoose";
+import { Schema, model } from "mongoose";
 
 const Peliculas = new Schema (
     {

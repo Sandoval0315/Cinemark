@@ -1,30 +1,43 @@
-import { Schema } from "mongoose";
+import mongoose from 'mongoose';
+const { Schema, model } = mongoose;
 
 const Clientes = new Schema(
     {
         nombre: {
             type: String,
-            require: true
+            required: true,
+            trim: true
         },
         correo: {
             type: String,
-            require: true
+            required: true,
+            unique: true,
+            lowercase: true,
+            match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Por favor ingresa un correo válido']
         },
         contraseña: {
             type: String,
-            require: true
+            required: true,
+            minlength: 6
         },
         telefono: {
-            type: Number,
-            require: true
+            type: String, // Cambiado a String para manejar formatos internacionales
+            required: true,
+            match: [/^[0-9]{10,15}$/, 'Por favor ingresa un teléfono válido']
         },
         direccion: {
             type: String,
-            require: true
+            required: true
         },
         activo: {
             type: Boolean,
-            require: true 
+            required: true,
+            default: true
         }
+    },
+    {
+        timestamps: true
     }
-)
+);
+
+export default model("Cliente", Clientes);

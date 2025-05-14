@@ -1,44 +1,51 @@
-import { Schema, models } from "mongoose";
+import mongoose from 'mongoose';
+const { Schema, model } = mongoose;
 
 const Empleados = new Schema(
     {
         nombre: {
             type: String,
-            require: true
+            required: true
         },
         correo: {
             type: String,
-            require: true
+            required: true,
+            unique: true
         },
         contraseña: {
             type: String,
-            require: true
+            required: true
         },
         telefono: {
             type: Number,
-            require: true
+            required: true
         },
         direccion: {
             type: String,
-            require: true
+            required: true
         },
         puesto: {
             type: String,
-            require: true
+            required: true
         },
         fecha_contratacion: {
             type: Date,
-            require: true
+            required: true,
+            default: Date.now
         },
         salario: {
             type: Number,
-            require: true
+            required: true
         },
         activo: {
             type: Boolean,
-            require: true
+            required: true,
+            default: true
         }
+    },
+    {
+        timestamps: true 
     }
-)
+);
 
-export default Empleados
+export default model("Empleado", Empleados);
